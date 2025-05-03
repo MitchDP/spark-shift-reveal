@@ -19,6 +19,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAdmin: () => boolean;
+  // In a real app, we would implement the register function
+  // register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
 }
 
 // Mock users for demonstration
@@ -94,11 +96,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // In a real app, we would implement the register function
+  /*
+  const register = async (name: string, email: string, password: string, role: UserRole) => {
+    // Implementation would typically involve API calls to create a user in a database
+    // For now, we're just showing a placeholder
+  };
+  */
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
     toast.info("You have been logged out");
-    navigate("/login");
+    navigate("/");
   };
 
   const isAdmin = () => {

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -56,7 +57,7 @@ const Login = () => {
                 />
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex-col space-y-2">
               <Button 
                 type="submit" 
                 className="w-full"
@@ -64,6 +65,12 @@ const Login = () => {
               >
                 {loading ? "Logging in..." : "Log In"}
               </Button>
+              <p className="text-sm text-center mt-2">
+                Don't have an account?{" "}
+                <Link to="/register" className="text-primary font-medium hover:underline">
+                  Create Account
+                </Link>
+              </p>
             </CardFooter>
           </form>
         </Card>
