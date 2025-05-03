@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { JobProvider } from "./contexts/JobContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PrintStyles from "./components/PrintStyles";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import ElectricianDashboard from "./pages/ElectricianDashboard";
@@ -20,6 +21,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <PrintStyles />
       <BrowserRouter>
         <AuthProvider>
           <JobProvider>

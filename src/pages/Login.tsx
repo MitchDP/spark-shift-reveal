@@ -74,15 +74,6 @@ const Login = () => {
             </CardFooter>
           </form>
         </Card>
-        
-        <div className="mt-8 text-center text-sm text-muted-foreground">
-          <div className="mb-4">
-            <p className="font-semibold">Demo accounts:</p>
-            <p>Admin: admin@example.com</p>
-            <p>Electrician: john@example.com or sarah@example.com</p>
-          </div>
-          <p>Any password will work for the demo</p>
-        </div>
       </div>
     </div>
   );

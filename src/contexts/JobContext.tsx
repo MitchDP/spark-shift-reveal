@@ -12,7 +12,6 @@ export interface Job {
   startTime: string;
   endTime: string;
   assignedToId: string;
-  priority: "low" | "medium" | "high";
   status: "scheduled" | "in-progress" | "completed" | "cancelled";
   notes?: string;
 }
@@ -28,6 +27,7 @@ interface JobContextType {
   getJobsForToday: (userId: string) => Job[];
   getJobsForUser: (userId: string) => Job[];
   getAllJobs: () => Job[];
+  clearSampleJobs: () => void;
 }
 
 // Generate sample data for the app
@@ -40,72 +40,7 @@ const generateSampleJobs = (): Job[] => {
     return date.toISOString().split('T')[0];
   };
   
-  return [
-    {
-      id: "1",
-      title: "Office Lighting Installation",
-      description: "Install new LED lighting fixtures in the main office area. Customer has requested all white fixtures with dimming capability.",
-      location: "123 Business Ave, Suite 400",
-      date: formatDate(today),
-      startTime: "08:00",
-      endTime: "12:00",
-      assignedToId: "2", // John
-      priority: "medium",
-      status: "scheduled",
-      notes: "Access code for building: 4321. Ask for Martha at reception."
-    },
-    {
-      id: "2",
-      title: "Residential Wiring Repair",
-      description: "Homeowner reporting electrical issues in kitchen. Inspect and repair faulty wiring and replace damaged outlets.",
-      location: "456 Homestead Lane",
-      date: formatDate(today),
-      startTime: "13:30",
-      endTime: "15:30",
-      assignedToId: "2", // John
-      priority: "high",
-      status: "scheduled",
-      notes: "Customer mentioned outlets sometimes spark. Bring extra GFCI outlets."
-    },
-    {
-      id: "3",
-      title: "Panel Upgrade",
-      description: "Upgrade old 100A electrical panel to new 200A panel. Customer has already purchased the new panel.",
-      location: "789 Main Street",
-      date: formatDate(today),
-      startTime: "09:00",
-      endTime: "16:00",
-      assignedToId: "3", // Sarah
-      priority: "high",
-      status: "scheduled",
-      notes: "Need to coordinate with utility company for service disconnect."
-    },
-    {
-      id: "4",
-      title: "Commercial Security Lighting",
-      description: "Install motion-activated security lighting around the perimeter of the building.",
-      location: "321 Industrial Parkway",
-      date: formatDate(tomorrow),
-      startTime: "08:00",
-      endTime: "17:00",
-      assignedToId: "2", // John
-      priority: "medium",
-      status: "scheduled"
-    },
-    {
-      id: "5",
-      title: "Hot Tub Installation",
-      description: "Wire new hot tub installation including GFCI protection and weatherproof connections.",
-      location: "555 Lakeside Drive",
-      date: formatDate(tomorrow),
-      startTime: "13:00",
-      endTime: "17:00",
-      assignedToId: "3", // Sarah
-      priority: "low",
-      status: "scheduled",
-      notes: "Hot tub already delivered. Customer will be home."
-    }
-  ];
+  return [];
 };
 
 const JobContext = createContext<JobContextType | undefined>(undefined);
@@ -194,6 +129,12 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+  const clearSampleJobs = () => {
+    setJobs([]);
+    localStorage.setItem("jobs", JSON.stringify([]));
+    toast.success("All sample jobs have been cleared");
+  };
+
   return (
     <JobContext.Provider
       value={{
@@ -207,6 +148,7 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         getJobsForToday,
         getJobsForUser,
         getAllJobs,
+        clearSampleJobs,
       }}
     >
       {children}

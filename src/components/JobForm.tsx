@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { useJobs, Job } from "../contexts/JobContext";
+import { useAuth } from "../contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,12 +22,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-// Mock list of electricians - in a real app this would come from the backend
-const ELECTRICIANS = [
-  { id: "2", name: "John Electrician" },
-  { id: "3", name: "Sarah Electrician" },
-];
-
 type JobFormProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -35,6 +30,9 @@ type JobFormProps = {
 
 const JobForm = ({ isOpen, onClose, editJob }: JobFormProps) => {
   const { addJob, updateJob } = useJobs();
+  const { getElectricians } = useAuth();
+  const electricians = getElectricians();
+  
   const [formData, setFormData] = useState<Omit<Job, "id">>({
     title: "",
     description: "",
@@ -43,7 +41,6 @@ const JobForm = ({ isOpen, onClose, editJob }: JobFormProps) => {
     startTime: "09:00",
     endTime: "17:00",
     assignedToId: "",
-    priority: "medium",
     status: "scheduled",
     notes: "",
   });
@@ -58,7 +55,6 @@ const JobForm = ({ isOpen, onClose, editJob }: JobFormProps) => {
         startTime: editJob.startTime,
         endTime: editJob.endTime,
         assignedToId: editJob.assignedToId,
-        priority: editJob.priority,
         status: editJob.status,
         notes: editJob.notes || "",
       });
@@ -72,7 +68,6 @@ const JobForm = ({ isOpen, onClose, editJob }: JobFormProps) => {
         startTime: "09:00",
         endTime: "17:00",
         assignedToId: "",
-        priority: "medium",
         status: "scheduled",
         notes: "",
       });
@@ -190,7 +185,7 @@ const JobForm = ({ isOpen, onClose, editJob }: JobFormProps) => {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="assignedToId">Assigned To *</Label>
               <Select
@@ -201,28 +196,17 @@ const JobForm = ({ isOpen, onClose, editJob }: JobFormProps) => {
                   <SelectValue placeholder="Select an electrician" />
                 </SelectTrigger>
                 <SelectContent>
-                  {ELECTRICIANS.map((electrician) => (
-                    <SelectItem key={electrician.id} value={electrician.id}>
-                      {electrician.name}
+                  {electricians.length > 0 ? (
+                    electricians.map((electrician) => (
+                      <SelectItem key={electrician.id} value={electrician.id}>
+                        {electrician.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="" disabled>
+                      No electricians available
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="priority">Priority</Label>
-              <Select
-                value={formData.priority}
-                onValueChange={(value) => handleSelectChange("priority", value as "low" | "medium" | "high")}
-              >
-                <SelectTrigger id="priority">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>

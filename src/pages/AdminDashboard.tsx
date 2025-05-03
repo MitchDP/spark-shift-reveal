@@ -5,6 +5,7 @@ import { useJobs, Job } from "../contexts/JobContext";
 import { format, parseISO, isToday, isTomorrow, addDays } from "date-fns";
 import JobCard from "../components/JobCard";
 import JobForm from "../components/JobForm";
+import CalendarView from "../components/CalendarView";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -12,9 +13,10 @@ import { toast } from "sonner";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
-  const { getAllJobs, deleteJob } = useJobs();
+  const { getAllJobs, deleteJob, clearSampleJobs } = useJobs();
   const [isJobFormOpen, setIsJobFormOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | undefined>(undefined);
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
   const allJobs = getAllJobs();
 
@@ -92,9 +94,9 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-primary text-primary-foreground py-4 px-6 shadow-md">
+      <header className="bg-primary text-primary-foreground py-4 px-6 shadow-md print:hidden">
         <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold">ElectriSchedule</h1>
+          <h1 className="text-xl font-bold">PDX Electric</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm hidden md:block">
               Welcome, {user?.name}
@@ -111,57 +113,75 @@ const AdminDashboard = () => {
       </header>
 
       <main className="container mx-auto py-6 px-4">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 print:hidden">
           <div>
             <h2 className="text-2xl font-bold">Admin Dashboard</h2>
             <p className="text-muted-foreground">Manage all electrician schedules</p>
           </div>
-          <Button className="mt-4 md:mt-0" onClick={handleAddJob}>
-            Add New Job
-          </Button>
+          <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
+            <Button onClick={handleAddJob}>
+              Add New Job
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setViewMode(viewMode === "list" ? "calendar" : "list")}
+            >
+              {viewMode === "list" ? "Calendar View" : "List View"}
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={clearSampleJobs}
+            >
+              Clear All Jobs
+            </Button>
+          </div>
         </div>
 
-        <Separator className="my-6" />
+        <Separator className="my-6 print:hidden" />
         
-        <Tabs defaultValue="today" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="today">
-              Today 
-              <span className="ml-2 text-xs bg-primary/10 rounded-full px-2 py-1">
-                {todayJobs.length}
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value="tomorrow">
-              Tomorrow
-              <span className="ml-2 text-xs bg-primary/10 rounded-full px-2 py-1">
-                {tomorrowJobs.length}
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value="upcoming">
-              Upcoming
-              <span className="ml-2 text-xs bg-primary/10 rounded-full px-2 py-1">
-                {upcomingJobs.length}
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value="past">Past</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="today" className="space-y-4">
-            {renderJobsList(todayJobs, "Today")}
-          </TabsContent>
-          
-          <TabsContent value="tomorrow" className="space-y-4">
-            {renderJobsList(tomorrowJobs, "Tomorrow")}
-          </TabsContent>
-          
-          <TabsContent value="upcoming" className="space-y-4">
-            {renderJobsList(upcomingJobs, "Upcoming Days")}
-          </TabsContent>
-          
-          <TabsContent value="past" className="space-y-4">
-            {renderJobsList(pastJobs, "Past Days")}
-          </TabsContent>
-        </Tabs>
+        {viewMode === "calendar" ? (
+          <CalendarView />
+        ) : (
+          <Tabs defaultValue="today" className="space-y-4 print:hidden">
+            <TabsList>
+              <TabsTrigger value="today">
+                Today 
+                <span className="ml-2 text-xs bg-primary/10 rounded-full px-2 py-1">
+                  {todayJobs.length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="tomorrow">
+                Tomorrow
+                <span className="ml-2 text-xs bg-primary/10 rounded-full px-2 py-1">
+                  {tomorrowJobs.length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="upcoming">
+                Upcoming
+                <span className="ml-2 text-xs bg-primary/10 rounded-full px-2 py-1">
+                  {upcomingJobs.length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="past">Past</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="today" className="space-y-4">
+              {renderJobsList(todayJobs, "Today")}
+            </TabsContent>
+            
+            <TabsContent value="tomorrow" className="space-y-4">
+              {renderJobsList(tomorrowJobs, "Tomorrow")}
+            </TabsContent>
+            
+            <TabsContent value="upcoming" className="space-y-4">
+              {renderJobsList(upcomingJobs, "Upcoming Days")}
+            </TabsContent>
+            
+            <TabsContent value="past" className="space-y-4">
+              {renderJobsList(pastJobs, "Past Days")}
+            </TabsContent>
+          </Tabs>
+        )}
       </main>
       
       <JobForm 

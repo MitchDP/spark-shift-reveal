@@ -23,12 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-
-// Mock list of electricians - in a real app this would come from a user context
-const ELECTRICIANS = [
-  { id: "2", name: "John Electrician" },
-  { id: "3", name: "Sarah Electrician" },
-];
+import { useAuth } from "../contexts/AuthContext";
 
 interface JobCardProps {
   job: Job;
@@ -39,14 +34,9 @@ interface JobCardProps {
 
 const JobCard = ({ job, onEdit, onDelete, isAdmin = false }: JobCardProps) => {
   const [showDetails, setShowDetails] = useState(false);
+  const { getElectricianName } = useAuth();
   
-  const assignedToName = ELECTRICIANS.find(e => e.id === job.assignedToId)?.name || "Unassigned";
-  
-  const priorityColors = {
-    low: "bg-blue-100 text-blue-800",
-    medium: "bg-yellow-100 text-yellow-800",
-    high: "bg-red-100 text-red-800",
-  };
+  const assignedToName = getElectricianName(job.assignedToId) || "Unassigned";
   
   const statusColors = {
     scheduled: "bg-purple-100 text-purple-800",
@@ -58,24 +48,24 @@ const JobCard = ({ job, onEdit, onDelete, isAdmin = false }: JobCardProps) => {
   return (
     <>
       <div 
-        className={`job-card ${job.priority === "high" ? "job-card-high-priority" : ""}`}
+        className="border p-4 rounded-lg shadow-sm hover:shadow transition-shadow bg-white cursor-pointer"
         onClick={() => setShowDetails(true)}
       >
         <div className="flex justify-between items-start">
           <div>
-            <div className="job-time">
+            <div className="text-sm text-muted-foreground">
               {format(new Date(`${job.date}T${job.startTime}`), "h:mm a")} - 
               {format(new Date(`${job.date}T${job.endTime}`), "h:mm a")}
             </div>
-            <h3 className="job-title">{job.title}</h3>
-            <div className="job-location">
+            <h3 className="font-medium text-lg">{job.title}</h3>
+            <div className="text-sm mt-1">
               {job.location}
             </div>
           </div>
           
           <div className="flex flex-col items-end gap-2">
-            <Badge variant="outline" className={priorityColors[job.priority]}>
-              {job.priority.charAt(0).toUpperCase() + job.priority.slice(1)}
+            <Badge variant="outline" className={statusColors[job.status]}>
+              {job.status.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}
             </Badge>
             
             {isAdmin && (
@@ -86,7 +76,7 @@ const JobCard = ({ job, onEdit, onDelete, isAdmin = false }: JobCardProps) => {
           </div>
         </div>
         
-        <p className="job-description">{job.description}</p>
+        <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{job.description}</p>
         
         <div className="flex justify-end mt-2">
           <Button 
@@ -122,11 +112,7 @@ const JobCard = ({ job, onEdit, onDelete, isAdmin = false }: JobCardProps) => {
                 </span>
               </div>
               
-              <div className="flex gap-2">
-                <Badge variant="outline" className={priorityColors[job.priority]}>
-                  {job.priority.charAt(0).toUpperCase() + job.priority.slice(1)} Priority
-                </Badge>
-                
+              <div>
                 <Badge variant="outline" className={statusColors[job.status]}>
                   {job.status.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}
                 </Badge>

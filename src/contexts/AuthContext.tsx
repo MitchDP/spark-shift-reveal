@@ -20,6 +20,8 @@ interface AuthContextType {
   logout: () => void;
   isAdmin: () => boolean;
   register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
+  getElectricians: () => User[];
+  getElectricianName: (id: string) => string | undefined;
 }
 
 // Initial mock users
@@ -29,18 +31,6 @@ const INITIAL_MOCK_USERS: User[] = [
     name: "Admin User",
     email: "admin@example.com",
     role: "admin",
-  },
-  {
-    id: "2",
-    name: "John Electrician",
-    email: "john@example.com",
-    role: "electrician",
-  },
-  {
-    id: "3",
-    name: "Sarah Electrician",
-    email: "sarah@example.com",
-    role: "electrician",
   },
 ];
 
@@ -153,8 +143,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return user?.role === "admin";
   };
 
+  const getElectricians = () => {
+    return mockUsers.filter(user => user.role === "electrician");
+  };
+
+  const getElectricianName = (id: string) => {
+    const electrician = mockUsers.find(user => user.id === id);
+    return electrician?.name;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, isAdmin, register }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        loading, 
+        login, 
+        logout, 
+        isAdmin, 
+        register, 
+        getElectricians,
+        getElectricianName 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
