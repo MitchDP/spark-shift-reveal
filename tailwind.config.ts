@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Electric theme colors
+				electric: {
+					blue: '#1e40af',
+					yellow: '#fbbf24',
+					lightBlue: '#60a5fa',
+					darkBlue: '#1e3a8a',
+					gray: '#f3f4f6',
 				}
 			},
 			borderRadius: {
