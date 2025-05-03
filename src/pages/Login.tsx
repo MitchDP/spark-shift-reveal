@@ -20,8 +20,8 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary">ElectriSchedule</h1>
-          <p className="text-muted-foreground mt-2">Scheduling for electrical professionals</p>
+          <h1 className="text-4xl font-bold text-primary">PDX Electric</h1>
+          <p className="text-muted-foreground mt-2">Scheduling for our electrical team</p>
         </div>
         
         <Card>
