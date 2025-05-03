@@ -8,16 +8,17 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuth } from "../contexts/AuthContext";
+import { UserRole } from "../contexts/AuthContext";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState("electrician");
+  const [role, setRole] = useState<UserRole>("electrician");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, register } = useAuth();
 
   // If user is already logged in, redirect to appropriate page
   React.useEffect(() => {
@@ -44,21 +45,11 @@ const Register = () => {
       return;
     }
     
-    setIsSubmitting(true);
-    
     try {
-      // Since we're using mock authentication for now, we'll just show a success message
-      toast.success("Account registered successfully! This is a demo, please use the demo accounts to log in.");
-      
-      // In a real implementation, we would create the account in the backend
-      // await createAccount(name, email, password, role);
-      
-      // Redirect to login page
-      navigate("/");
+      await register(name, email, password, role);
     } catch (error) {
-      toast.error("Error creating account: " + (error as Error).message);
-    } finally {
-      setIsSubmitting(false);
+      // Error is already handled in the register function
+      console.error("Registration error:", error);
     }
   };
 
@@ -130,7 +121,7 @@ const Register = () => {
                 <Label htmlFor="role">Role</Label>
                 <Select 
                   value={role} 
-                  onValueChange={setRole}
+                  onValueChange={(value: UserRole) => setRole(value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a role" />
@@ -165,13 +156,13 @@ const Register = () => {
         </Card>
         
         <div className="mt-8 text-center text-sm text-muted-foreground">
-          <p>Note: This is a demo app. For now, please use the demo accounts to log in.</p>
+          <p>This is a demo app. You can create new accounts or use the demo accounts below:</p>
           <div className="mt-2">
             <p className="font-semibold">Demo accounts:</p>
             <p>Admin: admin@example.com</p>
             <p>Electrician: john@example.com or sarah@example.com</p>
           </div>
-          <p>Any password will work for the demo</p>
+          <p>Any password will work for the demo accounts</p>
         </div>
       </div>
     </div>

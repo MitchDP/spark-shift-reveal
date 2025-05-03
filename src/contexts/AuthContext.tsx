@@ -19,12 +19,11 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAdmin: () => boolean;
-  // In a real app, we would implement the register function
-  // register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
+  register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
 }
 
-// Mock users for demonstration
-const MOCK_USERS: User[] = [
+// Initial mock users
+const INITIAL_MOCK_USERS: User[] = [
   {
     id: "1",
     name: "Admin User",
@@ -50,14 +49,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mockUsers, setMockUsers] = useState<User[]>([]);
   const navigate = useNavigate();
 
-  // Check for existing session on mount
+  // Check for existing session and restore mockUsers on mount
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
+
+    // Load stored users or use initial mock users
+    const storedUsers = localStorage.getItem("users");
+    if (storedUsers) {
+      setMockUsers(JSON.parse(storedUsers));
+    } else {
+      setMockUsers(INITIAL_MOCK_USERS);
+      localStorage.setItem("users", JSON.stringify(INITIAL_MOCK_USERS));
+    }
+    
     setLoading(false);
   }, []);
 
@@ -68,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
       // Find user with matching email
-      const foundUser = MOCK_USERS.find(u => u.email === email);
+      const foundUser = mockUsers.find(u => u.email === email);
       
       if (!foundUser) {
         throw new Error("Invalid email or password");
@@ -96,13 +106,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // In a real app, we would implement the register function
-  /*
   const register = async (name: string, email: string, password: string, role: UserRole) => {
-    // Implementation would typically involve API calls to create a user in a database
-    // For now, we're just showing a placeholder
+    setLoading(true);
+    try {
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
+      // Check if user with this email already exists
+      const existingUser = mockUsers.find(u => u.email === email);
+      if (existingUser) {
+        throw new Error("A user with this email already exists");
+      }
+      
+      // Create new user with unique ID
+      const newUser: User = {
+        id: Date.now().toString(), // Simple unique ID for demo
+        name,
+        email,
+        role,
+      };
+      
+      // Add to mock users array
+      const updatedUsers = [...mockUsers, newUser];
+      setMockUsers(updatedUsers);
+      
+      // Save to localStorage
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+      
+      toast.success("Account created successfully!");
+      navigate("/");
+    } catch (error) {
+      toast.error("Registration failed: " + (error as Error).message);
+    } finally {
+      setLoading(false);
+    }
   };
-  */
 
   const logout = () => {
     setUser(null);
@@ -116,7 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, isAdmin }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, isAdmin, register }}>
       {children}
     </AuthContext.Provider>
   );
